@@ -1,0 +1,12 @@
+name = "sm-interviewer"
+main = "index.js"
+compatibility_date = "2024-01-01"
+account_id = "ae80baf32de8fbcbaad241d9e6e75e9e"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+DISCORD_PUBLIC_KEY = "eb2a789841ed5243ac2ba495a8a087c25d245b2cc1db522d180090ab41994481"
+
+[[kv_namespaces]]
+binding = "INTERVIEW_STATE"
+id = "c2c49473fe4347c7a2ae4e3c37d0d56e"
