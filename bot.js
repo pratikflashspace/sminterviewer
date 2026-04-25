@@ -76,6 +76,7 @@ client.on('ready', () => {
 });
 
 client.on('messageCreate', async (message) => {
+  console.log(`Message received: ${message.content} in channel ${message.channel.id} from ${message.author.tag}`);
   if (message.author.bot) return;
 
   const channelId = message.channel.id;
