@@ -52,7 +52,7 @@ async function callAI(messages) {
     }
   );
   const data = await response.json();
-  return data.result?.response || "";
+ return data.result?.response || data.result?.choices?.[0]?.message?.content || data.choices?.[0]?.message?.content || "";
 }
 
 async function saveToClickUp(candidateName, answers) {
@@ -102,7 +102,7 @@ client.on('messageCreate', async (message) => {
         { role: "system", content: "You are a warm but sharp interviewer at Stirring Minds startup in Delhi. Ask ONE probing follow-up question to verify the candidate's venture experience. Be specific — ask for numbers, what they personally did, real obstacles. Max 2 sentences." },
         { role: "user", content: `Candidate said: "${content}". Generate one follow-up question.` }
       ]);
-      await message.channel.send(probe);
+    if (probe && probe.trim()) await message.channel.send(probe);
       return;
     }
   }
@@ -111,7 +111,7 @@ client.on('messageCreate', async (message) => {
   if (s.step === 12 && s.probingCount < 2) {
     s.probingCount++;
     const probe = await callAI([
-      { role: "system", content: "You are a warm but sharp interviewer at Stirring Minds startup in Delhi. The candidate just listed their hard skills. Pick the most interesting skill and ask ONE specific follow-up. Ask for real examples or results. Max 2 sentences." },
+      { role: "system", content: "You are a warm but sharp interviewer at Stirring Minds startup in Delhi. The candidate just listed their hard skills. Pick the most interesting skill and ask ONE specific follow-up. Ask for real examples or s. Max 2 sentences." },
       { role: "user", content: `Candidate's skills: "${content}". Generate one follow-up question.` }
     ]);
     await message.channel.send(probe);
