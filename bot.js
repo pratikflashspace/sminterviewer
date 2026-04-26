@@ -157,12 +157,13 @@ client.on('messageCreate', async (message) => {
   s.step++;
 
   if (s.step >= QUESTIONS.length) {
+    delete state[channelId];
     await saveToClickUp(s.candidateName, s.answers);
     await message.channel.send(`Thank you for taking the time to go through this, ${s.candidateName}. Your responses have been recorded and our team will review them carefully.\n\nIf you are shortlisted for the next round, you will hear from us within 3–5 working days via email or Discord.\n\nWishing you all the best.`);
-    delete state[channelId];
     return;
   }
 
+  const isLastQuestion = s.step === QUESTIONS.length - 1;
   const nextQuestion = QUESTIONS[s.step];
   const typingInterval3 = setInterval(() => {
     message.channel.sendTyping();
@@ -182,7 +183,8 @@ Rules:
 - Keep acknowledgement to 1 sentence maximum
 - The next question must be asked exactly as provided — do not rephrase it
 - Total response should be 2-4 sentences maximum
-- Be warm but professional — like a real interviewer who actually read the answer`
+- Be warm but professional — like a real interviewer who actually read the answer
+- CRITICAL: This is question ${s.step + 1} of ${QUESTIONS.length}. ${isLastQuestion ? "This is the FINAL question of the interview. Ask it and stop completely. Do NOT add any closing remarks, follow-up questions, or anything after it. Just acknowledge and ask the final question. Nothing else." : ""}`
     },
     {
       role: "user",
