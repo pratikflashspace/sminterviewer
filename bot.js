@@ -156,7 +156,36 @@ client.on('messageCreate', async (message) => {
     return;
   }
 await message.channel.sendTyping();
-await message.channel.send(QUESTIONS[s.step]);
+const nextQuestion = QUESTIONS[s.step];
+const humanResponse = await callAI([
+  { 
+    role: "system", 
+    content: `You are Priya, a warm, sharp and professional interviewer at Stirring Minds — a startup ecosystem in Delhi. You are conducting an interview for the AI Generalist role.
+
+Your job is to:
+1. Briefly acknowledge the candidate's previous answer in 1 sentence — be genuine, not generic. If the answer was vague or short, you can gently note that.
+2. Then naturally transition into asking the next question.
+
+Rules:
+- Never use emojis
+- Never say "Great answer!" or "Wonderful!" — be real, not flattering
+- Keep acknowledgement to 1 sentence maximum
+- The next question must be asked exactly as provided — do not rephrase it
+- Total response should be 2-4 sentences maximum
+- Be warm but professional — like a real interviewer who actually read the answer`
+  },
+  { 
+    role: "user", 
+    content: `Candidate just answered: "${content}"
+    
+Now acknowledge their answer and ask this next question exactly: "${nextQuestion}"`
+  }
+]);
+if (humanResponse && humanResponse.trim()) {
+  await message.channel.send(humanResponse);
+} else {
+  await message.channel.send(nextQuestion);
+}
 });
 
 client.on('interactionCreate', async (interaction) => {
