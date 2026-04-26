@@ -11,7 +11,7 @@ const QUESTIONS = [
   "What's your date of birth?",
   "What is your email address?",
   "What is your phone number?",
-  "Do you have a Linkedin Profile? Share your Linkedin ID URL"
+  "Do you have a Linkedin Profile? Share your Linkedin ID URL",
   "Which city are you currently living in?",
   "This role is based in-office in Delhi. Are you open to relocating? Please be honest — it genuinely helps us plan better.",
   "What is your latest educational qualification?",
