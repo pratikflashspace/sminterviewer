@@ -119,7 +119,7 @@ client.on('messageCreate', async (message) => {
   }
 
   // Probing for venture question (step 8)
-  if (s.step === 8 && s.probingCount < 2) {
+ if (s.step === 11 && s.probingCount < 2) {
     const ventureKeywords = ["started", "venture", "business", "startup", "founded", "ran", "built", "launched"];
     const hasVenture = ventureKeywords.some(k => content.toLowerCase().includes(k));
     if (hasVenture && content.length > 80) {
@@ -135,14 +135,14 @@ client.on('messageCreate', async (message) => {
   }
 
   // Probing for skills question (step 12)
-  if (s.step === 12 && s.probingCount < 2) {
+ if (s.step === 15 && s.probingCount < 2) {
     s.probingCount++;
     await message.channel.sendTyping();
     const probe = await callAI([
       { role: "system", content: "You are a warm but sharp interviewer at Stirring Minds startup in Delhi. The candidate just listed their hard skills. Pick the most interesting skill and ask ONE specific follow-up. Ask for real examples or s. Max 2 sentences." },
       { role: "user", content: `Candidate's skills: "${content}". Generate one follow-up question.` }
     ]);
-    await message.channel.send(probe);
+  if (probe && probe.trim()) await message.channel.send(probe);
     return;
   }
 
