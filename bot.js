@@ -124,8 +124,12 @@ client.on('messageCreate', async (message) => {
     const hasVenture = ventureKeywords.some(k => content.toLowerCase().includes(k));
     if (hasVenture && content.length > 80) {
       s.probingCount++;
-      await message.channel.sendTyping();
-      const probe = await callAI([
+     const typingInterval = setInterval(() => {
+  message.channel.sendTyping();
+}, 5000);
+
+const humanResponse = await callAI([...]);
+clearInterval(typingInterval);
         { role: "system", content: "You are a warm but sharp interviewer at Stirring Minds startup in Delhi. Ask ONE probing follow-up question to verify the candidate's venture experience. Be specific — ask for numbers, what they personally did, real obstacles. Max 2 sentences." },
         { role: "user", content: `Candidate said: "${content}". Generate one follow-up question.` }
       ]);
@@ -137,8 +141,12 @@ client.on('messageCreate', async (message) => {
   // Probing for skills question (step 12)
  if (s.step === 15 && s.probingCount < 2) {
     s.probingCount++;
-    await message.channel.sendTyping();
-    const probe = await callAI([
+const typingInterval = setInterval(() => {
+  message.channel.sendTyping();
+}, 5000);
+
+const humanResponse = await callAI([...]);
+clearInterval(typingInterval);
       { role: "system", content: "You are a warm but sharp interviewer at Stirring Minds startup in Delhi. The candidate just listed their hard skills. Pick the most interesting skill and ask ONE specific follow-up. Ask for real examples or s. Max 2 sentences." },
       { role: "user", content: `Candidate's skills: "${content}". Generate one follow-up question.` }
     ]);
@@ -155,8 +163,10 @@ client.on('messageCreate', async (message) => {
     delete state[channelId];
     return;
   }
-await message.channel.sendTyping();
 const nextQuestion = QUESTIONS[s.step];
+const typingInterval = setInterval(() => {
+  message.channel.sendTyping();
+}, 5000);
 const humanResponse = await callAI([
   { 
     role: "system", 
