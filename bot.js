@@ -60,6 +60,12 @@ async function callAI(messages) {
 
 async function saveToClickUp(candidateName, answers) {
   const content = answers.map((a, i) => `Q${i + 1}: ${QUESTIONS[i] || 'Follow-up'}\nA: ${a}`).join("\n\n");
+  
+const email = answers[2] || "";
+const phone = answers[3] || "";
+const linkedin = answers[4] || "";
+const ventureAnswer = answers[11] || "";
+
   await fetch(`https://api.clickup.com/api/v2/list/${CLICKUP_LIST_ID}/task`, {
     method: "POST",
     headers: {
@@ -69,11 +75,28 @@ async function saveToClickUp(candidateName, answers) {
     body: JSON.stringify({
       name: `Interview — ${candidateName}`,
       description: content,
-      status: "to do"
+      status: "to do",
+custom_fields: [
+  {
+    id: "2104e524-598d-4970-91e6-ee7490e0922c",
+    value: email
+  },
+  {
+    id: "95818473-a6f4-40a2-b976-ee98014d16eb",
+    value: phone
+  },
+  {
+    id: "32634985-e24c-46cd-8a96-9a08ac493406",
+    value: linkedin
+  },
+  {
+    id: "71ed4b05-7086-41a1-94ac-50ac2983686b",
+    value: ventureAnswer
+  }
+]
     })
   });
 }
-
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}`);
 });
