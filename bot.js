@@ -84,7 +84,7 @@ async function saveToClickUp(candidateName, answers) {
           },
           {
             id: "95818473-a6f4-40a2-b976-ee98014d16eb",
-            value: phone
+           value: {"phone": phone, "country_code": "+91"}
           },
           {
             id: "32634985-e24c-46cd-8a96-9a08ac493406",
