@@ -41,7 +41,7 @@ const client = new Client({
 
 async function callAI(messages) {
   const response = await fetch(
-    `https://gateway.ai.cloudflare.com/v1/d2ab95608d255a1cbfac7fc59c557989/mahesh-flashspace/workers-ai/@cf/moonshotai/kimi-k2.6',
+    `https://gateway.ai.cloudflare.com/v1/d2ab95608d255a1cbfac7fc59c557989/mahesh-flashspace/workers-ai/@cf/moonshotai/kimi-k2.6`,
     {
       method: "POST",
       headers: {
