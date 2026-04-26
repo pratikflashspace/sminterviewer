@@ -76,7 +76,7 @@ async function saveToClickUp(candidateName, answers) {
       body: JSON.stringify({
         name: `Interview — ${candidateName}`,
         description: content,
-        status: "to do",
+        status: "APPLICATIONS",
         custom_fields: [
           {
             id: "2104e524-598d-4970-91e6-ee7490e0922c",
