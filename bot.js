@@ -55,16 +55,16 @@ async function callAI(messages) {
     }
   );
   const data = await response.json();
- return data.result?.response || data.result?.choices?.[0]?.message?.content || data.choices?.[0]?.message?.content || "";
+  return data.result?.response || data.result?.choices?.[0]?.message?.content || data.choices?.[0]?.message?.content || "";
 }
 
 async function saveToClickUp(candidateName, answers) {
   const content = answers.map((a, i) => `Q${i + 1}: ${QUESTIONS[i] || 'Follow-up'}\nA: ${a}`).join("\n\n");
-  
-const email = answers[2] || "";
-const phone = answers[3] || "";
-const linkedin = answers[4] || "";
-const ventureAnswer = answers[11] || "";
+
+  const email = answers[2] || "";
+  const phone = answers[3] || "";
+  const linkedin = answers[4] || "";
+  const ventureAnswer = answers[11] || "";
 
   await fetch(`https://api.clickup.com/api/v2/list/${CLICKUP_LIST_ID}/task`, {
     method: "POST",
@@ -76,27 +76,28 @@ const ventureAnswer = answers[11] || "";
       name: `Interview — ${candidateName}`,
       description: content,
       status: "to do",
-custom_fields: [
-  {
-    id: "2104e524-598d-4970-91e6-ee7490e0922c",
-    value: email
-  },
-  {
-    id: "95818473-a6f4-40a2-b976-ee98014d16eb",
-    value: phone
-  },
-  {
-    id: "32634985-e24c-46cd-8a96-9a08ac493406",
-    value: linkedin
-  },
-  {
-    id: "71ed4b05-7086-41a1-94ac-50ac2983686b",
-    value: ventureAnswer
-  }
-]
+      custom_fields: [
+        {
+          id: "2104e524-598d-4970-91e6-ee7490e0922c",
+          value: email
+        },
+        {
+          id: "95818473-a6f4-40a2-b976-ee98014d16eb",
+          value: phone
+        },
+        {
+          id: "32634985-e24c-46cd-8a96-9a08ac493406",
+          value: linkedin
+        },
+        {
+          id: "71ed4b05-7086-41a1-94ac-50ac2983686b",
+          value: ventureAnswer
+        }
+      ]
     })
   });
 }
+
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}`);
 });
@@ -118,39 +119,37 @@ client.on('messageCreate', async (message) => {
     s.candidateName = content.split(" ")[0];
   }
 
-  // Probing for venture question (step 8)
- if (s.step === 11 && s.probingCount < 2) {
+  // Probing for venture question (step 11)
+  if (s.step === 11 && s.probingCount < 2) {
     const ventureKeywords = ["started", "venture", "business", "startup", "founded", "ran", "built", "launched"];
     const hasVenture = ventureKeywords.some(k => content.toLowerCase().includes(k));
     if (hasVenture && content.length > 80) {
       s.probingCount++;
-     const typingInterval = setInterval(() => {
-  message.channel.sendTyping();
-}, 5000);
-
-const humanResponse = await callAI([...]);
-clearInterval(typingInterval);
+      const typingInterval1 = setInterval(() => {
+        message.channel.sendTyping();
+      }, 5000);
+      const probe = await callAI([
         { role: "system", content: "You are a warm but sharp interviewer at Stirring Minds startup in Delhi. Ask ONE probing follow-up question to verify the candidate's venture experience. Be specific — ask for numbers, what they personally did, real obstacles. Max 2 sentences." },
         { role: "user", content: `Candidate said: "${content}". Generate one follow-up question.` }
       ]);
-    if (probe && probe.trim()) await message.channel.send(probe);
+      clearInterval(typingInterval1);
+      if (probe && probe.trim()) await message.channel.send(probe);
       return;
     }
   }
 
-  // Probing for skills question (step 12)
- if (s.step === 15 && s.probingCount < 2) {
+  // Probing for skills question (step 15)
+  if (s.step === 15 && s.probingCount < 2) {
     s.probingCount++;
-const typingInterval = setInterval(() => {
-  message.channel.sendTyping();
-}, 5000);
-
-const humanResponse = await callAI([...]);
-clearInterval(typingInterval);
-      { role: "system", content: "You are a warm but sharp interviewer at Stirring Minds startup in Delhi. The candidate just listed their hard skills. Pick the most interesting skill and ask ONE specific follow-up. Ask for real examples or s. Max 2 sentences." },
+    const typingInterval2 = setInterval(() => {
+      message.channel.sendTyping();
+    }, 5000);
+    const probe = await callAI([
+      { role: "system", content: "You are a warm but sharp interviewer at Stirring Minds startup in Delhi. The candidate just listed their hard skills. Pick the most interesting skill and ask ONE specific follow-up. Ask for real examples or results. Max 2 sentences." },
       { role: "user", content: `Candidate's skills: "${content}". Generate one follow-up question.` }
     ]);
-  if (probe && probe.trim()) await message.channel.send(probe);
+    clearInterval(typingInterval2);
+    if (probe && probe.trim()) await message.channel.send(probe);
     return;
   }
 
@@ -163,14 +162,15 @@ clearInterval(typingInterval);
     delete state[channelId];
     return;
   }
-const nextQuestion = QUESTIONS[s.step];
-const typingInterval = setInterval(() => {
-  message.channel.sendTyping();
-}, 5000);
-const humanResponse = await callAI([
-  { 
-    role: "system", 
-    content: `You are Priya, a warm, sharp and professional interviewer at Stirring Minds — a startup ecosystem in Delhi. You are conducting an interview for the AI Generalist role.
+
+  const nextQuestion = QUESTIONS[s.step];
+  const typingInterval3 = setInterval(() => {
+    message.channel.sendTyping();
+  }, 5000);
+  const humanResponse = await callAI([
+    {
+      role: "system",
+      content: `You are Priya, a warm, sharp and professional interviewer at Stirring Minds — a startup ecosystem in Delhi. You are conducting an interview for the AI Generalist role.
 
 Your job is to:
 1. Briefly acknowledge the candidate's previous answer in 1 sentence — be genuine, not generic. If the answer was vague or short, you can gently note that.
@@ -183,19 +183,20 @@ Rules:
 - The next question must be asked exactly as provided — do not rephrase it
 - Total response should be 2-4 sentences maximum
 - Be warm but professional — like a real interviewer who actually read the answer`
-  },
-  { 
-    role: "user", 
-    content: `Candidate just answered: "${content}"
-    
+    },
+    {
+      role: "user",
+      content: `Candidate just answered: "${content}"
+
 Now acknowledge their answer and ask this next question exactly: "${nextQuestion}"`
+    }
+  ]);
+  clearInterval(typingInterval3);
+  if (humanResponse && humanResponse.trim()) {
+    await message.channel.send(humanResponse);
+  } else {
+    await message.channel.send(nextQuestion);
   }
-]);
-if (humanResponse && humanResponse.trim()) {
-  await message.channel.send(humanResponse);
-} else {
-  await message.channel.send(nextQuestion);
-}
 });
 
 client.on('interactionCreate', async (interaction) => {
