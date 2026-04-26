@@ -66,6 +66,30 @@ async function saveToClickUp(candidateName, answers) {
   const linkedin = answers[4] || "";
   const ventureAnswer = answers[11] || "";
 
+  const taskData = {
+    name: `Interview — ${candidateName}`,
+    description: content,
+    status: "APPLICATIONS",
+    custom_fields: [
+      {
+        id: "2104e524-598d-4970-91e6-ee7490e0922c",
+        value: email
+      },
+      {
+        id: "95818473-a6f4-40a2-b976-ee98014d16eb",
+        value: `+91${phone}`
+      },
+      {
+        id: "32634985-e24c-46cd-8a96-9a08ac493406",
+        value: linkedin
+      },
+      {
+        id: "71ed4b05-7086-41a1-94ac-50ac2983686b",
+        value: ventureAnswer
+      }
+    ]
+  };
+
   try {
     const response = await fetch(`https://api.clickup.com/api/v2/list/${CLICKUP_LIST_ID}/task`, {
       method: "POST",
@@ -73,30 +97,42 @@ async function saveToClickUp(candidateName, answers) {
         "Authorization": CLICKUP_API_KEY,
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({
-        name: `Interview — ${candidateName}`,
-        description: content,
-        status: "APPLICATIONS",
-        custom_fields: [
-          {
-            id: "2104e524-598d-4970-91e6-ee7490e0922c",
-            value: email
-          },
-          {
-            id: "95818473-a6f4-40a2-b976-ee98014d16eb",
-           value: {"phone": phone, "country_code": "+91"}
-          },
-          {
-            id: "32634985-e24c-46cd-8a96-9a08ac493406",
-            value: linkedin
-          },
-          {
-            id: "71ed4b05-7086-41a1-94ac-50ac2983686b",
-            value: ventureAnswer
-          }
-        ]
-      })
+      body: JSON.stringify(taskData)
     });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error("ClickUp error with custom fields:", JSON.stringify(data));
+      console.log("Retrying without custom fields...");
+
+      // Retry without custom fields
+      const retryResponse = await fetch(`https://api.clickup.com/api/v2/list/${CLICKUP_LIST_ID}/task`, {
+        method: "POST",
+        headers: {
+          "Authorization": CLICKUP_API_KEY,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name: `Interview — ${candidateName}`,
+          description: content,
+          status: "APPLICATIONS"
+        })
+      });
+
+      const retryData = await retryResponse.json();
+      if (!retryResponse.ok) {
+        console.error("ClickUp retry also failed:", JSON.stringify(retryData));
+      } else {
+        console.log("ClickUp task created without custom fields for:", candidateName);
+      }
+    } else {
+      console.log("ClickUp task created successfully for:", candidateName);
+    }
+  } catch (error) {
+    console.error("saveToClickUp failed:", error.message);
+  }
+}
 
     const data = await response.json();
     if (!response.ok) {
