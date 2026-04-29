@@ -58,7 +58,7 @@ async function callAI(messages) {
   return data.result?.response || data.result?.choices?.[0]?.message?.content || data.choices?.[0]?.message?.content || "";
 }
 
-async function saveToClickUp(candidateName, answers) {
+  async function saveToClickUp(candidateName, answers, discordUserId) {
   const content = answers.map((a, i) => `Q${i + 1}: ${QUESTIONS[i] || 'Follow-up'}\nA: ${a}`).join("\n\n");
 
   const email = answers[2] || "";
@@ -93,6 +93,10 @@ async function saveToClickUp(candidateName, answers) {
           {
             id: "71ed4b05-7086-41a1-94ac-50ac2983686b",
             value: ventureAnswer
+          },
+          {
+            id: "07d64c03-1077-4755-997f-50b94fefa6e2",
+            value: discordUserId
           }
         ]
       })
@@ -191,7 +195,7 @@ client.on('messageCreate', async (message) => {
 
   if (s.step >= QUESTIONS.length) {
     delete state[channelId];
-    await saveToClickUp(s.candidateName, s.answers);
+    await saveToClickUp(s.candidateName, s.answers, s.discordUserId);
     await message.channel.send(`Thank you for taking the time to go through this, ${s.candidateName}. Your responses have been recorded and our team will review them carefully.\n\nIf you are shortlisted for the next round, you will hear from us within 3–5 working days via email or Discord.\n\nWishing you all the best.`);
     return;
   }
@@ -240,7 +244,8 @@ client.on('interactionCreate', async (interaction) => {
 
   const channelId = interaction.channelId;
 
-  state[channelId] = { step: 0, answers: [], probingCount: 0, candidateName: "" };
+  const userId = interaction.user.id;
+  state[channelId] = { step: 0, answers: [], probingCount: 0, candidateName: "", discordUserId: userId };
 
   await interaction.reply({ content: "Starting your interview now...", ephemeral: true });
 
